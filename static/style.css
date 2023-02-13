@@ -1,0 +1,87 @@
+:root{
+  --sitecolor: red;
+  --shadowcolor: #ff00008c;
+  --txtshadowcolor: #ff000063;
+  --boxshadow: 0 0 10px 1px var(--shadowcolor);
+  --boxdepth: .1em .1em var(--sitecolor);
+  --txtshdw: 6px var(--txtshadowcolor);
+  --txtpx: 4px;
+  --txtpxneg: -4px;
+  --textshadow: 0 var(--txtpx) var(--txtshdw), 0 var(--txtpxneg) var(--txtshdw), var(--txtpx) 0px var(--txtshdw), var(--txtpxneg) 0px var(--txtshdw);
+}
+#page_con{
+  height: 100vh;
+  width: 100vw;
+  background: black;
+  font-family: 'VT323', monospace;
+  font-size: 40px;
+  color: var(--sitecolor);
+  text-shadow: var(--textshadow);
+/*   position: relative; */
+}
+#terminal{
+  padding: .2em .5em;
+  font-size: 30px;
+/*   position: absolute; */
+}
+#calculator_con{
+  position: absolute; 
+  left: 0; 
+  right: 0; 
+  top: 20%;
+  margin: 0 auto;
+  width: 9.2em;
+}
+#calc-body{
+  width: min-content;
+  background-color: black;
+  border: .1em solid var(--sitecolor);
+  padding: .5em;
+  box-shadow: inset var(--boxshadow), var(--boxshadow), var(--boxdepth);  
+/*   width: 9.15em; */
+}
+#calc-display{
+  border: .1em solid var(--sitecolor);
+  margin-bottom: .6em;
+  padding: 0 .3em;
+  height: 1.5em;
+  text-align: right;
+  box-shadow: inset var(--boxshadow), var(--boxshadow);
+  overflow: hidden;
+  width: 8em; /* the div width is actually here */
+}
+#calc-display div{
+  float: right;
+}
+.operator-span{
+  padding: 0 .1em;
+}
+#calc-buttons_con{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: .3em;
+}
+button{
+  font-family: inherit;
+  font-size: inherit;
+  text-shadow: inherit;
+  background: transparent;
+  color: inherit;
+  border: .1em solid var(--sitecolor);
+  height: 1.5em;
+  box-shadow: inset var(--boxshadow), var(--boxshadow), .05em .05em var(--sitecolor);
+  transition: all .1s;
+  cursor: pointer;
+  transform: translate(-.05em, -.05em);
+}
+button:active{
+  transition: all .1s;
+  transform: translate(0em, 0em);
+  
+  box-shadow: inset var(--boxshadow), var(--boxshadow), 0 0 var(--sitecolor);
+}
+
+#equal-btn{
+  grid-column: 3 / 5;
+  grid-row: 5;
+}

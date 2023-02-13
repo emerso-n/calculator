@@ -1,43 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Calculator</title>
-</head>
-<script type="module">
-    import * as THREE from 'three';
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=VT323&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="static/base.css" />
+    <link rel="stylesheet" href="static/style.css" />
+    <script src="static/javascript.js" defer></script>
+  </head>
+  <body>
+    <div id="page_con">
+      <div id="terminal"></div>
+      <div id="calculator_con">
+        <div id="calc-body">
+          <div id="calc-display"><div></div></div>
+          <div id="calc-buttons_con">
+            <button id="clear-btn">C</button>
+            <button id="clearentry-btn">CE</button>
+            <button id="negative-btn">&plus;/&minus;</button>
+            <button id="divide-btn" class="operator">&divide;</button>
 
-    function main(){
-        const canvas = document.querySelector("#c");
-        const renderer = new THREE.WebGLRenderer({canvas});
+            <button id="seven-btn">7</button>
+            <button id="eight-btn">8</button>
+            <button id="nine-btn">9</button>
+            <button id="multiply-btn" class="operator">&times;</button>
 
-        const fov = 75;
-        const aspect = 2;
-        const near = 0.1;
-        const far = 5;
-        const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+            <button id="four-btn">4</button>
+            <button id="five-btn">5</button>
+            <button id="six-btn">6</button>
+            <button id="subtract-btn" class="operator">&minus;</button>
 
-        camera.position.z = 2;
+            <button id="one-btn">1</button>
+            <button id="two-btn">2</button>
+            <button id="three-btn">3</button>
+            <button id="plus-btn" class="operator">&plus;</button>
 
-        const scene = new THREE.Scene();
-
-        const boxWidth = 1;
-        const boxHeight = 1;
-        const boxDepth = 1;
-        const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
-
-        const material = new THREE.MeshBasicMaterial({color: 0x44aa88});
-
-        const cube = new THREE.Mesh(geometry, material);
-
-        scene.add(cube);
-        renderer.render(scene, camera);
-    }
-    main()
-</script>
-<body>
-    <canvas id="c"></canvas>
-</body>
+            <button id="decimal-btn">.</button>
+            <button id="zero-btn">0</button>
+            <button id="equal-btn">&equals;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
