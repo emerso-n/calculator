@@ -36,9 +36,10 @@ then when you start typing again it makes another new line, carrying over the la
 if you clear the console it will make a new line
 */
 function buttonClick(e) {
+    e.target.blur()
     let currSpanIsOperator = operators.includes(currSpan().textContent);
     let operatorBtn = e.target.className
-    if (currTerminal().textContent.includes("=")) {
+    if (currTerminal().textContent.includes("=") && e.target.id != "clear-btn") {
         let prevNum = currTerminal().innerText.slice(4);
         newTerminalLine()
         currTerminal().innerText += prevNum
@@ -49,29 +50,29 @@ function buttonClick(e) {
             newTerminalLine()
             break;
         case "clearentry-btn":
-            currSpan().textContent = currSpan().textContent.slice(0, -1);
-            if (!currSpan().textContent && operationSpans.length > 1) {
+            currSpan().textContent = currSpan().textContent.slice(0, -1); //remove the last character
+            if (!currSpan().textContent && operationSpans.length > 1) { //if this makes the span empty and this isn't the first span, delete the span
                 currSpan().remove();
                 operationSpans.pop();
             }
-            if (currTerminal().textContent.length > 2) {
+            if (currTerminal().textContent.length > 2) { //prevents deleting of the >&nbsp;
                 currTerminal().textContent = currTerminal().textContent.slice(0, -1);
             }
             break;
         case "negative-btn":
-            if (currSpanIsOperator) {
+            if (currSpanIsOperator) { //make a new span and add a negative symbol to it
                 operationSpans.push(createDiv("span", calcDisplay));
                 currSpan().textContent = "-";
                 currTerminal().textContent += "-";
-            } else if (currSpan().textContent.includes("-")) {
+            } else if (currSpan().textContent.includes("-")) { //remove the current negative symbol
                 currSpan().textContent = currSpan().textContent.slice(1);
                 currTerminal().textContent = currTerminal().textContent.replace(/-(?!.*-)/, "");
-            } else {
+            } else { //add a negative symbol to the front of the span
                 currSpan().textContent = "-" + currSpan().textContent;
                 currTerminal().textContent = currTerminal().textContent.replace(/([\+\-\*\/\s])(?!.*[\+\-\*\/\s])/, "$1-");
             }
             break;
-        case "decimal-btn":
+        case "decimal-btn": //if the current span doesn't already have a decimal, add a decimal
             if (!currSpan().textContent.includes(".")) {
                 typeInput(".");
             }
