@@ -22,6 +22,7 @@
   font-size: 40px;
   color: var(--sitecolor);
   text-shadow: var(--textshadow);
+  
 }
 #page_con::after{
   content: "";
