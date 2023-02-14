@@ -90,6 +90,8 @@ function buttonClick(e) {
                 if (!operationSpans[0].textContent) break //if operatorbtn but the first span is empty aka nothing has been input yet, return
                 if (currSpanIsOperator) { //if operatorbtn but the current span is already an operator, then just replace the operator
                     currSpan().textContent = e.target.textContent;
+                    currTerminal().textContent = currTerminal().textContent.slice(0, -1)
+                    currTerminal().textContent += e.target.textContent
                     break;
                 }
                 if (!currSpanIsOperator) operationSpans.push(createDiv('span', calcDisplay, 'operator-span')); //if operatorBtn and the current span is not an operator, then make a new span for the operator
