@@ -35,10 +35,17 @@ when you press equals then it makes a new p with =value
 then when you start typing again it makes another new line, carrying over the last result number if you didn't clear it
 if you clear the console it will make a new line
 */
+let parenthesisCount = 0
+let lastSpanIsLParen = false
 function buttonClick(e) {
+    e.target.blur()
     let currSpanIsOperator = operators.includes(currSpan().textContent);
+    //check if the last span is a paren or if the current one is empty
+    if (operationSpans.length > 1) {
+        lastSpanIsLParen = operationSpans[operationSpans.length - 2].textContent.includes("(") && !currSpan().textContent
+    }
     let operatorBtn = e.target.className
-    if (currTerminal().textContent.includes("=")) {
+    if (currTerminal().textContent.includes("=") && e.target.id != "clear-btn") {
         let prevNum = currTerminal().innerText.slice(4);
         newTerminalLine()
         currTerminal().innerText += prevNum
@@ -49,36 +56,63 @@ function buttonClick(e) {
             newTerminalLine()
             break;
         case "clearentry-btn":
-            currSpan().textContent = currSpan().textContent.slice(0, -1);
-            if (!currSpan().textContent && operationSpans.length > 1) {
+            currSpan().textContent = currSpan().textContent.slice(0, -1); //remove the last character
+            if (!currSpan().textContent && operationSpans.length > 1) {//if this makes the span empty and this isn't the first span, delete the span
                 currSpan().remove();
                 operationSpans.pop();
             }
-            if (currTerminal().textContent.length > 2) {
+            if (currTerminal().textContent.length > 2) { //prevents deleting of the >&nbsp;
                 currTerminal().textContent = currTerminal().textContent.slice(0, -1);
             }
             break;
+        case "leftparenthesis-btn":
+            //we gotta make this a new span right
+            //or nah i forget lowkeylmao
+            //i think not really unless its relevant to the code cuz i turn the whole thing into a string later anyway
+            //if you make this a new span then you can check its length for the right parenthesis
+            //how will that interact with negative btn
+            //ok what if i make the parenthesies their own spans
+            operationSpans.push(createDiv("span", calcDisplay)); //make the parenthesis their own spans
+            typeInput("(");
+            operationSpans.push(createDiv("span", calcDisplay));
+            parenthesisCount++;
+            break;
+        case "rightparenthesis-btn":
+            //if parenthesis count > 0
+            //no empty parenthesis
+            //it can be just a number but it cant end on an operator
+            if (parenthesisCount > 0 && !currSpanIsOperator && !lastSpanIsLParen) {
+                operationSpans.push(createDiv("span", calcDisplay));
+                typeInput(")");
+                operationSpans.push(createDiv("span", calcDisplay));
+                parenthesisCount--
+            }
+            break;
         case "negative-btn":
-            if (currSpanIsOperator) {
+            if (currSpanIsOperator) { //make a new span and add a negative symbol to it
                 operationSpans.push(createDiv("span", calcDisplay));
                 currSpan().textContent = "-";
                 currTerminal().textContent += "-";
-            } else if (currSpan().textContent.includes("-")) {
+            } else if (currSpan().textContent.includes("-")) { //remove the current negative symbol
                 currSpan().textContent = currSpan().textContent.slice(1);
                 currTerminal().textContent = currTerminal().textContent.replace(/-(?!.*-)/, "");
-            } else {
+            } else { //add a negative symbol to the front of the span
                 currSpan().textContent = "-" + currSpan().textContent;
                 currTerminal().textContent = currTerminal().textContent.replace(/([\+\-\*\/\s])(?!.*[\+\-\*\/\s])/, "$1-");
             }
             break;
         case "decimal-btn":
-            if (!currSpan().textContent.includes(".")) {
+            if (!currSpan().textContent.includes(".")) { //if the current span doesn't already have a decimal, add a decimal
                 typeInput(".");
             }
             break;
         case "equal-btn":
-            if (!currSpanIsOperator && operationSpans.length > 1) {
-                let expression = operationSpans.reduce((total, span) => total + span.textContent, "");
+            if (!currSpanIsOperator && operationSpans.length > 1) { //can't calculate expression if the last value is an operator, if theres only one number/span, and if there are open parenthesis
+                //i could also just add in the rest of the parenthesis. that would probably feel better
+                currSpan().textContent += ")".repeat(parenthesisCount)
+                currTerminal().textContent += ")".repeat(parenthesisCount)
+                parenthesisCount = 0
+                let expression = operationSpans.reduce((total, span) => total + span.textContent, ""); //make all the spans into one string that gets passed into calculate
                 clearDisplay();
                 result = calculate(expression)
                 currSpan().textContent = result;
@@ -86,8 +120,8 @@ function buttonClick(e) {
             }
             break;
         default: //if operatorbtn or number
-            if (operatorBtn) {
-                if (!operationSpans[0].textContent) break //if operatorbtn but the first span is empty aka nothing has been input yet, return
+            if (operatorBtn) { //if an operator button was just pressed
+                if (!operationSpans[0].textContent || lastSpanIsLParen) break //if operatorbtn but the first span is empty aka nothing has been input yet, return
                 if (currSpanIsOperator) { //if operatorbtn but the current span is already an operator, then just replace the operator
                     currSpan().textContent = e.target.textContent;
                     currTerminal().textContent = currTerminal().textContent.slice(0, -1)
@@ -156,11 +190,14 @@ function createDiv(tag, parent, className = "") {
     return div;
 }
 
+// console.log("5-6(5+68(7-5))".replace(/(\d+)\(/g, "$1*(")) 
+//gotta do something about ((((9)))) btw. i think. idk
+
 function calculate(expression) {
+    expression = expression.replace(/(\d+)\(/g, "$1×(") //add * between numbers and parenthesis
+    expression = expression.replace(/(\)+)\(/g, "$1×(") //add * between numbers and parenthesis
+    console.log(expression)
     let result = parseAddition(expression)
-    // if ((result.toString().split('.')[1] || []).length > maxDecimalPlaces) { //either get the decimal points after the split, or if it's not a decimal and can't split then get the length of an empty array
-    //     // result = result.toFixed(maxDecimalPlaces)
-    // }
     result = result.toString().replace(/0*$/, "");
     return result
 }
@@ -188,9 +225,18 @@ function parseMultiplication(expression) {
 function parseDivision(expression) {
     //if its a single number it just doesn't get changed by any of this
     let numbersStrings = expression.split('÷'); // ["num", "num", "num"]
-    let numbers = numbersStrings.map(str => +str); //[num, num, num]
+    let numbers = numbersStrings.map(str => parseParenthesis(str)); //[num, num, num]
     let result = numbers.slice(1).reduce((total, num) => total / num, numbers[0]); //same deal as with subtraction
     return result;
+}
+function parseParenthesis(expression){
+    console.log(expression)
+    let numbersStrings = expression.split('('); // we gotta split by ( and )
+    numbersStrings = expression.split(')'); // we gotta split by ( and )
+    console.log(numbersStrings)
+    // let numbers = numbersStrings.map(str => +str); //[num, num, num]
+    // let result = numbers.slice(1).reduce((total, num) => total / num, numbers[0]); //same deal as with subtraction
+    // return result;
 }
 
 let pressedBtn
@@ -222,7 +268,6 @@ var xOffset = 0;
 var yOffset = 0;
 
 function dragStart(e) {
-    console.log("dragstart")
     if (e.type === "touchstart") {
         initialX = e.touches[0].clientX - xOffset;
         initialY = e.touches[0].clientY - yOffset;
@@ -237,14 +282,12 @@ function dragStart(e) {
     }
 }
 function dragEnd(e) {
-    console.log("dragend")
     initialX = currentX;
     initialY = currentY;
     container.style.pointerEvents = "none"
     active = false;
 }
 function drag(e) {
-    console.log("drag")
     if (active) {
 
         e.preventDefault();
