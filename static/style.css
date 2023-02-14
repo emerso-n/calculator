@@ -1,44 +1,90 @@
 :root{
   --sitecolor: red;
-  --shadowcolor: #ff00008c;
+  --shadowcolor: #ff00007d;
   --txtshadowcolor: #ff000063;
   --boxshadow: 0 0 10px 1px var(--shadowcolor);
   --boxdepth: .1em .1em var(--sitecolor);
   --txtshdw: 6px var(--txtshadowcolor);
   --txtpx: 4px;
   --txtpxneg: -4px;
-  --textshadow: 0 var(--txtpx) var(--txtshdw), 0 var(--txtpxneg) var(--txtshdw), var(--txtpx) 0px var(--txtshdw), var(--txtpxneg) 0px var(--txtshdw);
+  --textshadow: 0 var(--txtpx) var(--txtshdw), 
+    0 var(--txtpxneg) var(--txtshdw),
+    var(--txtpx) 0px var(--txtshdw), 
+    var(--txtpxneg) 0px var(--txtshdw);
+  --crtblack: #0000002e;
 }
 #page_con{
   height: 100vh;
   width: 100vw;
   background: black;
+  background-image: radial-gradient( rgba(60, 0, 0, 0.49), black 120% );
   font-family: 'VT323', monospace;
   font-size: 40px;
   color: var(--sitecolor);
   text-shadow: var(--textshadow);
-/*   position: relative; */
+}
+#page_con::after{
+  content: "";
+  position: absolute;
+  inset: 0 0 0 0;
+  background: repeating-linear-gradient(var(--crtblack), 
+    var(--crtblack) 1px, 
+    transparent 1px, 
+    transparent 2px);
+  pointer-events: none;
+  height: 100vh;
+  width: 100vw;
 }
 #terminal{
   padding: .2em .5em;
   font-size: 30px;
-/*   position: absolute; */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  max-height: 100vh;
+  overflow-wrap: anywhere;
+}
+.currTerminal:after {
+  content: "";
+  transform: translateY(.25em);
+  position: absolute;
+  background: red;
+  height: .7em;
+  width: .4em;
+  animation: 2s infinite blink;
+}
+@keyframes blink{
+  0%{
+    background: red;
+  }
+  50%{
+    background: red;
+  }
+  51%{
+    background: none;
+  }
+  100%{
+    background: none;
+  }
 }
 #calculator_con{
-  position: absolute; 
-  left: 0; 
-  right: 0; 
-  top: 20%;
-  margin: 0 auto;
-  width: 9.2em;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
 }
 #calc-body{
+  position: absolute;
+  inset: 0 0 0 0;
+  margin: auto;
+  pointer-events: all;
   width: min-content;
-  background-color: black;
+  height: min-content;
+  background-color: transparent;
   border: .1em solid var(--sitecolor);
   padding: .5em;
   box-shadow: inset var(--boxshadow), var(--boxshadow), var(--boxdepth);  
-/*   width: 9.15em; */
 }
 #calc-display{
   border: .1em solid var(--sitecolor);
@@ -74,11 +120,11 @@ button{
   cursor: pointer;
   transform: translate(-.05em, -.05em);
 }
-button:active{
+button:active, button:focus{
   transition: all .1s;
   transform: translate(0em, 0em);
-  
   box-shadow: inset var(--boxshadow), var(--boxshadow), 0 0 var(--sitecolor);
+  outline: none;
 }
 
 #equal-btn{

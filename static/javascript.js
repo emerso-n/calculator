@@ -5,8 +5,12 @@ const calcDisplay = document.querySelector("#calc-display div");
 const terminal = document.querySelector("#terminal");
 let terminalArray = []
 const newTerminalLine = () => {
+    if (terminalArray.length > 0) {
+        currTerminal().classList.remove("currTerminal")
+    }
     p = createDiv("p", terminal);
     p.innerHTML = ">&nbsp;";
+    p.className = "currTerminal";
     terminalArray.push(p)
     return p
 }
@@ -34,6 +38,11 @@ if you clear the console it will make a new line
 function buttonClick(e) {
     let currSpanIsOperator = operators.includes(currSpan().textContent);
     let operatorBtn = e.target.className
+    if (currTerminal().textContent.includes("=")) {
+        let prevNum = currTerminal().innerText.slice(4);
+        newTerminalLine()
+        currTerminal().innerText += prevNum
+    }
     switch (e.target.id) {
         case "clear-btn":
             clearDisplay();
@@ -45,15 +54,21 @@ function buttonClick(e) {
                 currSpan().remove();
                 operationSpans.pop();
             }
+            if (currTerminal().textContent.length > 2) {
+                currTerminal().textContent = currTerminal().textContent.slice(0, -1);
+            }
             break;
         case "negative-btn":
             if (currSpanIsOperator) {
                 operationSpans.push(createDiv("span", calcDisplay));
                 currSpan().textContent = "-";
+                currTerminal().textContent += "-";
             } else if (currSpan().textContent.includes("-")) {
                 currSpan().textContent = currSpan().textContent.slice(1);
+                currTerminal().textContent = currTerminal().textContent.replace(/-(?!.*-)/, "");
             } else {
                 currSpan().textContent = "-" + currSpan().textContent;
+                currTerminal().textContent = currTerminal().textContent.replace(/([\+\-\*\/\s])(?!.*[\+\-\*\/\s])/, "$1-");
             }
             break;
         case "decimal-btn":
@@ -67,7 +82,7 @@ function buttonClick(e) {
                 clearDisplay();
                 result = calculate(expression)
                 currSpan().textContent = result;
-                newTerminalLine().innerHTML += "&nbsp;="+result
+                newTerminalLine().innerHTML += "&nbsp;=" + result
             }
             break;
         default: //if operatorbtn or number
@@ -81,7 +96,7 @@ function buttonClick(e) {
             }
             if (!operatorBtn && currSpanIsOperator) operationSpans.push(createDiv('span', calcDisplay)); //if not operatorBtn but the current span is an operator, make a new span for the new value
 
-            typeInput(e.target.textContent); 
+            typeInput(e.target.textContent);
     }
 }
 
@@ -111,6 +126,21 @@ function typeInput(val) {
         currTerminal().innerText += prevNum
     }
     currTerminal().innerText += val;
+
+    if (currSpan().textContent == "01134" || currSpan().textContent == "80085") {
+        p = createDiv("p", terminal);
+        p.innerHTML = ">&nbsp;";
+        currSpan().textContent == "01134" ? txt = "hi :)" : txt = "(￢‿￢ )"
+        setTimeout(() => typeWriter(p, txt), 200)
+    }
+}
+
+function typeWriter(element, txt, i = 0) {
+    if (i < txt.length) {
+        element.innerHTML += txt.charAt(i);
+        i++;
+        setTimeout(() => typeWriter(element, txt, i), 60); //speed in miliseconds
+    }
 }
 
 function clearDisplay() {
@@ -126,9 +156,10 @@ function createDiv(tag, parent, className = "") {
 
 function calculate(expression) {
     let result = parseAddition(expression)
-    if ((result.toString().split('.')[1] || []).length > maxDecimalPlaces) { //either get the decimal points after the split, or if it's not a decimal and can't split then get the length of an empty array
-        result = result.toFixed(maxDecimalPlaces)
-    }
+    // if ((result.toString().split('.')[1] || []).length > maxDecimalPlaces) { //either get the decimal points after the split, or if it's not a decimal and can't split then get the length of an empty array
+    //     // result = result.toFixed(maxDecimalPlaces)
+    // }
+    result = result.toString().replace(/0*$/, "");
     return result
 }
 function parseAddition(expression) {
@@ -160,3 +191,76 @@ function parseDivision(expression) {
     return result;
 }
 
+let pressedBtn
+document.addEventListener("keydown", (e) => {
+    pressedBtn = document.querySelector(`[data-key="${e.key}"]`);
+    pressedBtn.click();
+    pressedBtn.focus();
+})
+document.addEventListener("keyup", (e) => {
+    if (e.key == pressedBtn.dataset.key) pressedBtn.blur()
+})
+
+let dragItem = document.querySelector("#calc-body");
+let container = document.querySelector("#calculator_con");
+container.addEventListener("touchstart", dragStart, false);
+container.addEventListener("touchend", dragEnd, false);
+container.addEventListener("touchmove", drag, false);
+
+container.addEventListener("mousedown", dragStart, false);
+container.addEventListener("mouseup", dragEnd, false);
+container.addEventListener("mousemove", drag, false);
+
+var active = false;
+var currentX;
+var currentY;
+var initialX;
+var initialY;
+var xOffset = 0;
+var yOffset = 0;
+
+function dragStart(e) {
+    console.log("dragstart")
+    if (e.type === "touchstart") {
+        initialX = e.touches[0].clientX - xOffset;
+        initialY = e.touches[0].clientY - yOffset;
+    } else {
+        initialX = e.clientX - xOffset;
+        initialY = e.clientY - yOffset;
+    }
+
+    if (e.target === dragItem) {
+        container.style.pointerEvents = "all"
+        active = true;
+    }
+}
+function dragEnd(e) {
+    console.log("dragend")
+    initialX = currentX;
+    initialY = currentY;
+    container.style.pointerEvents = "none"
+    active = false;
+}
+function drag(e) {
+    console.log("drag")
+    if (active) {
+
+        e.preventDefault();
+
+        if (e.type === "touchmove") {
+            currentX = e.touches[0].clientX - initialX;
+            currentY = e.touches[0].clientY - initialY;
+        } else {
+            currentX = e.clientX - initialX;
+            currentY = e.clientY - initialY;
+        }
+
+        xOffset = currentX;
+        yOffset = currentY;
+
+        setTranslate(currentX, currentY, dragItem);
+    }
+}
+function setTranslate(xPos, yPos, el) {
+    el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
+}
