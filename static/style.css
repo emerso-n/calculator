@@ -19,8 +19,8 @@
   background: black;
   background-image: radial-gradient( rgba(60, 0, 0, 0.49), black 120% );
   font-family: 'VT323', monospace;
-  font-size: clamp(25px, 9vw, 40px);
 /*   font-size: 40px; */
+  font-size: clamp(25px, min(9vw, 7vh), 40px);
   color: var(--sitecolor);
   text-shadow: var(--textshadow);
   
