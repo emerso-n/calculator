@@ -162,7 +162,7 @@ function calculate(expression) {
     // if ((result.toString().split('.')[1] || []).length > maxDecimalPlaces) { //either get the decimal points after the split, or if it's not a decimal and can't split then get the length of an empty array
     //     // result = result.toFixed(maxDecimalPlaces)
     // }
-    result = result.toString().replace(/0*$/, "");
+    if (result % 1 != 0) result = result.toString().replace(/\.?0+$/, "");
     return result
 }
 function parseAddition(expression) {
